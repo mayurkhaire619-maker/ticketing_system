@@ -3,95 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrewDesk – Support Tracker</title>
+    <title>Support Tracker - Archive Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --primary: #008248; /* Heineken Green */
-            --bg: #f8fafc; 
-            --card: rgba(255, 255, 255, 0.95); /* Slightly transparent card */
-            --border: #e2e8f0; 
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        /* BACKGROUND IMAGE LOGIC */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('heineken-bg.jpg'); /* Ensure your image is named this */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.5; /* 50% Transparency */
-            z-index: -1;
-        }
-
-        .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-        
-        h1 { color: #004d2c; text-shadow: 1px 1px 2px white; }
-
+        :root { --primary: #4f46e5; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+        .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        .card { 
-            background: var(--card); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            backdrop-filter: blur(5px); /* Adds a professional frosted effect */
-        }
+        /* Sections */
+        .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px 0; color: #475569; display: flex; align-items: center; gap: 10px; }
+        .badge-count { background: #e2e8f0; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
         
-        .section-title { 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            margin: 20px 0 10px 0; 
-            color: #1e293b; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            background: rgba(255,255,255,0.7);
-            padding: 5px 10px;
-            border-radius: 6px;
-            width: fit-content;
-        }
-
-        .badge-count { background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
-        
-        .ticket-item { 
-            background: rgba(255, 255, 255, 0.9); 
-            padding: 15px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border); 
-            border-left: 5px solid #64748b; 
-            margin-bottom: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
+        /* Tickets */
+        .ticket-item { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); border-left: 5px solid #64748b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .prio-high { border-left-color: #ef4444; }
         .prio-medium { border-left-color: #f59e0b; }
         .prio-low { border-left-color: #10b981; }
 
-        .completed-item { opacity: 0.7; border-left-color: #cbd5e1 !important; background: #f1f5f9; }
-        .completed-item h3 { text-decoration: line-through; color: #64748b; }
+        /* Completed State */
+        .completed-item { opacity: 0.6; border-left-color: #cbd5e1 !important; background: #f1f5f9; }
+        .completed-item h3 { text-decoration: line-through; color: #94a3b8; }
 
-        .btn-complete { background: #008248; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-        .btn-complete:hover { background: #005e34; }
+        .btn-complete { background: #dcfce7; color: #15803d; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-complete:hover { background: #bbf7d0; }
         
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
-        button#submitBtn { width: 100%; background: #008248; color: white; border: none; padding: 12px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; }
+        button#submitBtn { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; }
 
         @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -125,7 +64,7 @@
             <div id="activeList"></div>
 
             <div class="section-title" style="margin-top: 40px;">
-                Completed / Resolved <span class="badge-count" id="doneCount" style="background:#64748b">0</span>
+                Completed / Resolved <span class="badge-count" id="doneCount">0</span>
             </div>
             <div id="completedList"></div>
         </div>
@@ -159,7 +98,7 @@
     function renderList(elementId, tickets, isActive) {
         const div = document.getElementById(elementId);
         if (tickets.length === 0) {
-            div.innerHTML = `<p style="color:white; text-shadow:1px 1px 2px rgba(0,0,0,0.5);">No items here.</p>`;
+            div.innerHTML = `<p style="color:#94a3b8; font-size:0.9rem;">No items here.</p>`;
             return;
         }
 
@@ -167,7 +106,7 @@
             <div class="ticket-item ${isActive ? 'prio-' + t.priority : 'completed-item'}">
                 <div>
                     <h3 style="margin:0; font-size:1.1rem;">${t.subject}</h3>
-                    <small>${new Date(t.created_at).toLocaleDateString()} | Priority: ${t.priority.toUpperCase()}</small>
+                    <small>${new Date(t.created_at).toLocaleDateString()} | Priority: ${t.priority}</small>
                     <p style="margin:8px 0 0 0; font-size:0.9rem;">${t.description}</p>
                 </div>
                 ${isActive ? `<button class="btn-complete" onclick="markComplete(${t.id})">Mark Complete</button>` : '<span>✅</span>'}
@@ -175,6 +114,7 @@
         `).join('');
     }
 
+    // UPDATE STATUS LOGIC (MOVE TO COMPLETED)
     async function markComplete(id) {
         const { error } = await _supabase
             .from('tickets')
@@ -185,6 +125,7 @@
         else fetchTickets();
     }
 
+    // CREATE TICKET
     document.getElementById('ticketForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
