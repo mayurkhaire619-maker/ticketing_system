@@ -3,105 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Support System</title>
-    <!-- Supabase JS Library -->
+    <title>Support Tracker - Archive Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
-        :root { 
-            --primary: #4f46e5; 
-            --bg: #f8fafc; 
-            --card: #ffffff; 
-            --text-main: #1e293b;
-            --border: #e2e8f0;
-        }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            margin: 0;
-            padding: 40px 20px;
-        }
-
-        .container { max-width: 1100px; margin: 0 auto; }
+        :root { --primary: #4f46e5; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+        .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        header { margin-bottom: 40px; text-align: center; }
-        header h1 { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; }
-
-        .grid { display: grid; grid-template-columns: 380px 1fr; gap: 30px; }
-
-        .card { 
-            background: var(--card); 
-            padding: 30px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            height: fit-content;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+        /* Sections */
+        .section-title { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px 0; color: #475569; display: flex; align-items: center; gap: 10px; }
+        .badge-count { background: #e2e8f0; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
         
-        input, select, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1.5px solid var(--border); 
-            border-radius: 8px; 
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        textarea { resize: vertical; min-height: 100px; }
-
-        button { 
-            width: 100%; 
-            background: var(--primary); 
-            color: white; 
-            padding: 14px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
-
-        button:hover { background: #4338ca; transform: translateY(-1px); }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        /* Ticket Item Styles */
-        .ticket-list { display: flex; flex-direction: column; gap: 15px; }
-
-        .ticket-item { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border);
-            border-left: 6px solid #cbd5e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            transition: transform 0.2s;
-        }
-
+        /* Tickets */
+        .ticket-item { background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); border-left: 5px solid #64748b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .prio-high { border-left-color: #ef4444; }
         .prio-medium { border-left-color: #f59e0b; }
         .prio-low { border-left-color: #10b981; }
 
-        .ticket-content h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
-        .ticket-meta { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; }
-        .ticket-desc { color: #475569; line-height: 1.5; }
+        /* Completed State */
+        .completed-item { opacity: 0.6; border-left-color: #cbd5e1 !important; background: #f1f5f9; }
+        .completed-item h3 { text-decoration: line-through; color: #94a3b8; }
 
-        .delete-btn { 
-            background: #fee2e2; 
-            color: #ef4444; 
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            font-size: 0.8rem;
-            width: auto;
-        }
+        .btn-complete { background: #dcfce7; color: #15803d; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-complete:hover { background: #bbf7d0; }
         
-        .delete-btn:hover { background: #fecaca; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
+        button#submitBtn { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; }
 
         @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -109,150 +38,115 @@
 <body>
 
 <div class="container">
-    <header>
-        <h1>BrewDesk – where insights are brewed</h1>
-        <p>Analytics Ticketing System</p>
-    </header>
-
+    <h1>Ticketing System</h1>
     <div class="grid">
-        <!-- New Ticket Form -->
+        <!-- Form -->
         <div class="card">
-            <h2 style="margin-top:0">Create Ticket</h2>
+            <h3>New Issue</h3>
             <form id="ticketForm">
-                <div class="form-group">
-                    <label>Issue Subject</label>
-                    <input type="text" id="subject" placeholder="e.g., Server is down" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Priority</label>
-                    <select id="priority">
-                        <option value="low">Low Priority</option>
-                        <option value="medium" selected>Medium Priority</option>
-                        <option value="high">High Priority</option>
-                    </select>
-                </div>
-				
-				                <div class="form-group">
-                    <label>Function</label>
-                    <select id="priority">
-                        <option value="Sales">Sales</option>
-                        <option value="Finance" selected>Finance</option>
-                        <option value="Supply Chain">Supply Chain</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="description" placeholder="Explain the issue in detail..." required></textarea>
-                </div>
-
-                <button type="submit" id="submitBtn">Submit Ticket</button>
+                <label>Subject</label><input type="text" id="subject" required>
+                <label>Priority</label>
+                <select id="priority">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <label>Description</label><textarea id="description" required></textarea>
+                <button type="submit" id="submitBtn">Create Ticket</button>
             </form>
         </div>
 
-        <!-- Live Ticket Feed -->
+        <!-- Dashboard -->
         <div>
-            <h2 style="margin-top:0">Active Database Records</h2>
-            <div id="status">Loading tickets from cloud...</div>
-            <div id="ticketContainer" class="ticket-list"></div>
+            <div class="section-title">
+                Active Issues <span class="badge-count" id="activeCount">0</span>
+            </div>
+            <div id="activeList"></div>
+
+            <div class="section-title" style="margin-top: 40px;">
+                Completed / Resolved <span class="badge-count" id="doneCount">0</span>
+            </div>
+            <div id="completedList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // 1. SUPABASE INITIALIZATION
+    // YOUR SUPABASE CONFIG
     const SUPABASE_URL = 'https://kyyezpoyqwbfcaeckjsr.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5eWV6cG95cXdiZmNhZWNranNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjU2OTEsImV4cCI6MjA4MTcwMTY5MX0.TQsAWCm3tzObJ1lLdfQLAHrdMwIG43jTG71_RNrycmg';
-    
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const ticketForm = document.getElementById('ticketForm');
-    const container = document.getElementById('ticketContainer');
-    const statusText = document.getElementById('status');
-
-    // 2. FETCH TICKETS (READ)
     async function fetchTickets() {
-        statusText.innerText = "Syncing with database...";
-        
         const { data, error } = await _supabase
             .from('tickets')
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (error) {
-            statusText.innerText = "Error: " + error.message;
-            console.error(error);
-        } else {
-            statusText.style.display = data.length > 0 ? 'none' : 'block';
-            if(data.length === 0) statusText.innerText = "No tickets found in database.";
-            renderTickets(data);
-        }
+        if (error) return console.error(error);
+
+        const active = data.filter(t => t.status !== 'completed');
+        const done = data.filter(t => t.status === 'completed');
+
+        document.getElementById('activeCount').innerText = active.length;
+        document.getElementById('doneCount').innerText = done.length;
+
+        renderList('activeList', active, true);
+        renderList('completedList', done, false);
     }
 
-    // 3. RENDER TO HTML
-    function renderTickets(tickets) {
-        container.innerHTML = tickets.map(t => `
-            <div class="ticket-item prio-${t.priority}">
-                <div class="ticket-content">
-                    <h3>${t.subject}</h3>
-                    <div class="ticket-meta">
-                        <strong>ID:</strong> ${t.id} | 
-                        <strong>Created:</strong> ${new Date(t.created_at).toLocaleString()}
-                    </div>
-                    <div class="ticket-desc">${t.description}</div>
+    function renderList(elementId, tickets, isActive) {
+        const div = document.getElementById(elementId);
+        if (tickets.length === 0) {
+            div.innerHTML = `<p style="color:#94a3b8; font-size:0.9rem;">No items here.</p>`;
+            return;
+        }
+
+        div.innerHTML = tickets.map(t => `
+            <div class="ticket-item ${isActive ? 'prio-' + t.priority : 'completed-item'}">
+                <div>
+                    <h3 style="margin:0; font-size:1.1rem;">${t.subject}</h3>
+                    <small>${new Date(t.created_at).toLocaleDateString()} | Priority: ${t.priority}</small>
+                    <p style="margin:8px 0 0 0; font-size:0.9rem;">${t.description}</p>
                 </div>
-                <button class="delete-btn" onclick="deleteTicket(${t.id})">Resolve/Delete</button>
+                ${isActive ? `<button class="btn-complete" onclick="markComplete(${t.id})">Mark Complete</button>` : '<span>✅</span>'}
             </div>
         `).join('');
     }
 
-    // 4. CREATE TICKET (INSERT)
-    ticketForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        
-        btn.disabled = true;
-        btn.innerText = "Connecting...";
-
-        const newTicket = {
-            subject: document.getElementById('subject').value,
-            priority: document.getElementById('priority').value,
-            description: document.getElementById('description').value
-        };
-
-        const { error } = await _supabase.from('tickets').insert([newTicket]);
-
-        if (error) {
-            alert("Error saving to database: " + error.message);
-        } else {
-            ticketForm.reset();
-            await fetchTickets();
-        }
-
-        btn.disabled = false;
-        btn.innerText = "Submit Ticket";
-    });
-
-    // 5. DELETE TICKET (DELETE)
-    async function deleteTicket(id) {
-        if (!confirm("Are you sure you want to remove this ticket?")) return;
-        
+    // UPDATE STATUS LOGIC (MOVE TO COMPLETED)
+    async function markComplete(id) {
         const { error } = await _supabase
             .from('tickets')
-            .delete()
+            .update({ status: 'completed' })
             .eq('id', id);
-
-        if (error) {
-            alert("Error deleting: " + error.message);
-        } else {
-            fetchTickets();
-        }
+        
+        if (error) alert(error.message);
+        else fetchTickets();
     }
 
-    // Load data on page open
+    // CREATE TICKET
+    document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+
+        const { error } = await _supabase.from('tickets').insert([{
+            subject: document.getElementById('subject').value,
+            priority: document.getElementById('priority').value,
+            description: document.getElementById('description').value,
+            status: 'active'
+        }]);
+
+        if (error) alert(error.message);
+        else {
+            document.getElementById('ticketForm').reset();
+            fetchTickets();
+        }
+        btn.disabled = false;
+    });
+
     fetchTickets();
 </script>
-
 </body>
 </html>
