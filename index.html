@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Ticketing System</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        /* Form Styling */
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        textarea { height: 100px; resize: vertical; }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+
+        /* Ticket List Styling */
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ticket-card {
+            background: white;
+            padding: 16px;
+            border-left: 5px solid #cbd5e1;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .ticket-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .priority-high { border-color: #ef4444; }
+        .priority-high .badge { background: #fee2e2; color: #b91c1c; }
+
+        .priority-medium { border-color: #f59e0b; }
+        .priority-medium .badge { background: #fef3c7; color: #b45309; }
+
+        .priority-low { border-color: #10b981; }
+        .priority-low .badge { background: #d1fae5; color: #047857; }
+
+        .ticket-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .ticket-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 5px;
+            width: auto;
+        }
+
+        .delete-btn:hover { color: #ef4444; }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Support Ticketing System</h1>
+        <p>Submit a ticket and our team will get back to you shortly.</p>
+    </header>
+
+    <div class="grid">
+        <!-- Ticket Creation Form -->
+        <div class="card">
+            <h3>Create New Ticket</h3>
+            <form id="ticketForm">
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" placeholder="What's the issue?" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category">
+                        <option value="Technical">Technical Issue</option>
+                        <option value="Billing">Billing & Account</option>
+                        <option value="Feature Request">Feature Request</option>
+                        <option value="General">General Inquiry</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Provide more details..." required></textarea>
+                </div>
+
+                <button type="submit">Create Ticket</button>
+            </form>
+        </div>
+
+        <!-- Ticket Display Area -->
+        <div>
+            <h3 style="margin-top:0">Recent Tickets</h3>
+            <div id="ticketList" class="ticket-list">
+                <div class="empty-state">No tickets found. Submit the form to create one.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ticketForm = document.getElementById('ticketForm');
+    const ticketList = document.getElementById('ticketList');
+    let tickets = [];
+
+    ticketForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // 1. Get Form Values
+        const subject = document.getElementById('subject').value;
+        const category = document.getElementById('category').value;
+        const priority = document.getElementById('priority').value;
+        const description = document.getElementById('description').value;
+        const id = Math.floor(Math.random() * 10000);
+        const date = new Date().toLocaleString();
+
+        // 2. Create Ticket Object
+        const newTicket = { id, subject, category, priority, description, date };
+
+        // 3. Add to Data Array
+        tickets.unshift(newTicket);
+
+        // 4. Update UI
+        renderTickets();
+
+        // 5. Reset Form
+        ticketForm.reset();
+    });
+
+    function renderTickets() {
+        if (tickets.length === 0) {
+            ticketList.innerHTML = '<div class="empty-state">No tickets found. Submit the form to create one.</div>';
+            return;
+        }
+
+        ticketList.innerHTML = tickets.map(ticket => `
+            <div class="ticket-card priority-${ticket.priority}">
+                <div class="ticket-header">
+                    <h4 class="ticket-title">${ticket.subject}</h4>
+                    <div>
+                        <span class="badge">${ticket.priority}</span>
+                        <button class="delete-btn" onclick="deleteTicket(${ticket.id})">&times;</button>
+                    </div>
+                </div>
+                <div class="ticket-meta">
+                    <strong>ID: #${ticket.id}</strong> | 
+                    <span>Category: ${ticket.category}</span> | 
+                    <span>Created: ${ticket.date}</span>
+                </div>
+                <div class="ticket-desc">
+                    ${ticket.description}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function deleteTicket(id) {
+        tickets = tickets.filter(t => t.id !== id);
+        renderTickets();
+    }
+</script>
+
+</body>
+</html>
